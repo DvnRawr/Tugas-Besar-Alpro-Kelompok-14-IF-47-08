@@ -133,10 +133,10 @@ func editData() {
 	fmt.Printf("Data berhasil diubah: Tanggal %d, Nomor Urut %d, Nama Baru: %s\n", tanggal, noUrut, namaBaru)
 }
 
-func selectionSort(arr [NMAX * 9]Urutan) {
-	for i := 0; i < NMAX*9-1; i++ {
+func selectionSort(arr *[NMAX * 9]Urutan, n int) {
+	for i := 0; i < n-1; i++ {
 		minIdx := i
-		for j := i + 1; j < NMAX*9; j++ {
+		for j := i + 1; j < n; j++ {
 			if arr[j].tanggal < arr[minIdx].tanggal {
 				minIdx = j
 			} else if arr[j].tanggal == arr[minIdx].tanggal && arr[j].noUrut < arr[minIdx].noUrut {
@@ -164,7 +164,7 @@ func jadwalCheckIn() {
 		}
 	}
 
-	selectionSort(urutans)
+	selectionSort(&urutans, index)
 
 	fmt.Println("Jadwal Check-in Mahasiswa:")
 	fmt.Println("Check-in bulan depan. Check-in Sesuai Tanggal Pendaftaran.")
@@ -176,8 +176,8 @@ func jadwalCheckIn() {
 	}
 }
 
-func binarySearch(arr [NMAX * 9]Urutan, tanggal int) int {
-	left, right := 0, NMAX*9-1
+func binarySearch(arr [NMAX * 9]Urutan, tanggal int, n int) int {
+	left, right := 0, n-1
 
 	for left <= right {
 		mid := (left + right) / 2
@@ -213,24 +213,24 @@ func cariCheckInBerdasarkanTanggal() {
 		}
 	}
 
+	selectionSort(&urutans, index)
+
 	var tanggal int
 	fmt.Print("Masukkan tanggal yang dicari (1-31): ")
 	fmt.Scanln(&tanggal)
 
-	found := false
-	fmt.Println("Data ditemukan:")
-	for i := 0; i < index; i++ {
-		if urutans[i].tanggal == tanggal {
-			nama := namaList[urutans[i].tanggal-1][urutans[i].noUrut-1]
-			noKamar := DapatkanNoKamar(urutans[i].tanggal, urutans[i].noKamar)
-			waktuCheckIn := DapatkanWaktuCheckIn(urutans[i].noUrut)
-			fmt.Printf("Nama: %s, Tanggal: %d, Nomor Urut: %d, Nomor Kamar: %s, Jam: %s\n", nama, urutans[i].tanggal, urutans[i].noUrut, noKamar, waktuCheckIn)
-			found = true
-		}
+	startIndex := binarySearch(urutans, tanggal, index)
+	if startIndex == -1 {
+		fmt.Println("Tidak ada data yang ditemukan untuk tanggal tersebut.")
+		return
 	}
 
-	if !found {
-		fmt.Println("Tidak ada data yang ditemukan untuk tanggal tersebut.")
+	fmt.Println("Data ditemukan:")
+	for i := startIndex; i < index && urutans[i].tanggal == tanggal; i++ {
+		nama := namaList[urutans[i].tanggal-1][urutans[i].noUrut-1]
+		noKamar := DapatkanNoKamar(urutans[i].tanggal, urutans[i].noKamar)
+		waktuCheckIn := DapatkanWaktuCheckIn(urutans[i].noUrut)
+		fmt.Printf("Nama: %s, Tanggal: %d, Nomor Urut: %d, Nomor Kamar: %s, Jam: %s\n", nama, urutans[i].tanggal, urutans[i].noUrut, noKamar, waktuCheckIn)
 	}
 }
 
